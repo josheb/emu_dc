@@ -1,4 +1,5 @@
-emu_dc
-======
+EQEmu - Custom Game Implementation for EverQuest
 
-EQEmulator Dungeon Crawl
+TODO: A less useless readme file.
+
+Dependencies can be obtained at http://eqemu.github.com/
