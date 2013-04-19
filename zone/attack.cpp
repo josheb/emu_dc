@@ -1246,6 +1246,9 @@ bool Client::Attack(Mob* other, int Hand, bool bRiposte, bool IsStrikethrough, b
 		else
 			damage = MakeRandomInt(min_hit, max_hit);
 
+		//DCBOOKMARK
+		damage = mod_client_damage(damage, skillinuse, Hand, weapon, other);
+
 		mlog(COMBAT__DAMAGE, "Damage calculated to %d (min %d, max %d, str %d, skill %d, DMG %d, lv %d)",
 			damage, min_hit, max_hit, GetSTR(), GetSkill(skillinuse), weapon_damage, mylevel);
 
@@ -1869,6 +1872,9 @@ bool NPC::Attack(Mob* other, int Hand, bool bRiposte, bool IsStrikethrough, bool
 		    damage = (max_dmg+eleBane);
 		}
 		
+		//DCBOOKMARK
+		damage = mod_npc_damage(damage, skillinuse, Hand, &weapon_inst, other);
+
 		int32 hate = damage;
 		if(IsPet())
 		{
@@ -3427,8 +3433,8 @@ void Mob::CommonDamage(Mob* attacker, int32 &damage, const uint16 spell_id, cons
 		if (damage > 0 && ((skill_used == BASH || skill_used == KICK) && attacker))
 		{
 			// NPCs can stun with their bash/kick as soon as they recieve it.
-			// Clients can stun mobs under level 56 with their bash/kick when they get level 55 or greater.
-			if((attacker->IsNPC()) || (attacker->IsClient() && attacker->GetLevel() >= 55 && GetLevel() < 56))
+			// Clients can stun mobs under level 56 with their bash/kick when they get level 55 or greater. -- DCBOOKMARK for rules
+			if( attacker->IsNPC() || (attacker->IsClient() && attacker->GetLevel() >= RuleI(Combat, ClientStunLevel) && GetLevel() < RuleI(Spells, BaseImmunityLevel)) )
 			{
 				if (MakeRandomInt(0,99) < (RuleI(Character, NPCBashKickStunChance)) || attacker->IsClient())
 				{

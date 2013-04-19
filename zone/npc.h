@@ -456,8 +456,9 @@ public:
 
 	//DCBOOKMARK
     uint32 	GetSpawnKillCount();
-    void 	mod_prespawn(Spawn2 *sp);
     int 	GetScore();
+    void 	mod_prespawn(Spawn2 *sp);
+	int 	mod_npc_damage(int damage, SkillType skillinuse, int hand, ItemInst* weapon, Mob* other);
 
 protected:
 	

@@ -361,7 +361,8 @@ RULE_INT ( Combat, NPCFlurryChance, 20) // Chance for NPC to flurry.
 RULE_BOOL (Combat,TauntOverLevel, 1) //Allows you to taunt NPC's over warriors level.
 RULE_REAL (Combat,TauntSkillFalloff, 0.33)//For every taunt skill point that's not maxed you lose this % chance to taunt.
 RULE_BOOL (Combat,EXPFromDmgShield, false) //Determine if damage from a damage shield counts for EXP gain.
-RULE_REAL ( Combat, MonkACBonusWeight, 15.0)
+RULE_INT ( Combat, MonkACBonusWeight, 15)
+RULE_INT ( Combat, ClientStunLevel, 55) //This is the level where client kicks and bashes can stun the target
 RULE_CATEGORY_END()
 
 RULE_CATEGORY( NPC )

@@ -1146,6 +1146,7 @@ public:
     void LoadAccountFlags();
     void SetAccountFlag(std::string flag, std::string val);
     std::string GetAccountFlag(std::string flag);    float GetDamageMultiplier(SkillType);
+	int mod_client_damage(int damage, SkillType skillinuse, int hand, ItemInst* weapon, Mob* other);
 
 protected:
 	friend class Mob;
