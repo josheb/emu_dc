@@ -845,6 +845,9 @@ void Client::ChannelMessageReceived(uint8 chan_num, uint8 language, uint8 lang_s
 		safe_delete(pack);
 	}
 
+	//DCBOOKMARK - Return true to proceed, false to return
+	if(!mod_client_message(message, chan_num)) { return; }
+
 	// Garble the message based on drunkness
 	if (m_pp.intoxication > 0) {
 		GarbleMessage(message, (int)(m_pp.intoxication / 3));
@@ -2337,10 +2340,11 @@ bool Client::CheckIncreaseSkill(SkillType skillid, Mob *against_who, int chancem
 
 	if(against_who)
 	{
-		if(against_who->SpecAttacks[IMMUNE_AGGRO] || against_who->IsClient() || 
-			GetLevelCon(against_who->GetLevel()) == CON_GREEN)
+		if( against_who->SpecAttacks[IMMUNE_AGGRO] || against_who->IsClient() ||
+			GetLevelCon(against_who->GetLevel()) == CON_GREEN )
 		{
-				return false;
+			//DCBOOKMARK - false by default
+			return mod_can_increase_skill(skillid, against_who);
 		}
 	}
 
@@ -2352,6 +2356,10 @@ bool Client::CheckIncreaseSkill(SkillType skillid, Mob *against_who, int chancem
 		if (Chance < 1)
 			Chance = 1; // Make it always possible
 		Chance = (Chance * RuleI(Character, SkillUpModifier) / 100);
+
+		//DCBOOKMARK
+		Chance = mod_increase_skill_chance(Chance, against_who);
+
 		if(MakeRandomFloat(0, 99) < Chance)
 		{
 			SetSkill(skillid, GetRawSkill(skillid) + 1);
@@ -2720,6 +2728,9 @@ bool Client::BindWound(Mob* bindmob, bool start, bool fail){
 						max_percent = 70 + 10 * maxHPBonus;
 					}
 
+					//DCBOOKMARK
+					max_percent = mod_bindwound_percent(max_percent, bindmob);
+
 					int max_hp = bindmob->GetMaxHP()*max_percent/100;
 
 					// send bindmob new hp's
@@ -2738,7 +2749,10 @@ bool Client::BindWound(Mob* bindmob, bool start, bool fail){
 						int bindBonus = spellbonuses.BindWound + itembonuses.BindWound + aabonuses.BindWound;
 
 						bindhps += bindhps*bindBonus / 100;
-							
+
+						//DCBOOKMARK
+						bindhps = mod_bindwound_hp(bindhps, bindmob);
+
 						//if the bind takes them above the max bindable
 						//cap it at that value. Dont know if live does it this way
 						//but it makes sense to me.

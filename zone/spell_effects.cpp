@@ -2810,7 +2810,7 @@ int Mob::CalcSpellEffectValue(uint16 spell_id, int effect_id, int caster_level, 
 	}
 
 	//DCBOOKMARK
-	effect_value = mod_effect_value(effect_value, spells[spell_id].effectid[effect_id], caster);
+	effect_value = mod_effect_value(effect_value, spell_id, spells[spell_id].effectid[effect_id], caster);
 
 	return(effect_value);
 }

@@ -1147,6 +1147,15 @@ public:
     void SetAccountFlag(std::string flag, std::string val);
     std::string GetAccountFlag(std::string flag);    float GetDamageMultiplier(SkillType);
 	int mod_client_damage(int damage, SkillType skillinuse, int hand, ItemInst* weapon, Mob* other);
+	bool mod_client_message(char* message, uint8 chan_num);
+	bool mod_can_increase_skill(SkillType skillid, Mob* against_who);
+	int16 mod_increase_skill_chance(int16 chance, Mob* against_who);
+	int mod_bindwound_percent(int max_percent, Mob* bindmob);
+	int mod_bindwound_hp(int bindhps, Mob* bindmob);
+	int mod_client_haste(int h);
+	void mod_consider(Mob* tmob, Consider_Struct* con);
+	bool mod_saylink(const std::string&, bool silentsaylink);
+	int16 mod_pet_power(int16 act_power, uint16 spell_id);
 
 protected:
 	friend class Mob;

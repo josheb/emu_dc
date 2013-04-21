@@ -2662,6 +2662,9 @@ void Client::Handle_OP_Consider(const EQApplicationPacket *app)
         con->faction = FACTION_DUBIOUS;
     }
 
+	//DCBOOKMARK
+	mod_consider(tmob, con);
+
 	QueuePacket(outapp);
 	safe_delete(outapp);
 	return;
@@ -3257,6 +3260,9 @@ void Client::Handle_OP_ItemLinkClick(const EQApplicationPacket *app)
 
 			if((response).size() > 0)
 			{
+				//DCBOOKMARK
+				if( !mod_saylink(response, silentsaylink) ) { return; }
+
 				if(this->GetTarget() && this->GetTarget()->IsNPC())
 				{
 					if(silentsaylink)

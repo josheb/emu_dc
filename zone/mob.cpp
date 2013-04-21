@@ -1975,7 +1975,7 @@ void Mob::SetAttackTimer() {
 							continue;
 						if(pi->IsType(ItemClassContainer) && pi->GetItem()->BagType == bagTypeQuiver)
 						{
-							float temp_wr = (pi->GetItem()->BagWR / 3);
+							float temp_wr = ( pi->GetItem()->BagWR / RuleI(Combat, QuiverWRHasteDiv) );
 							if(temp_wr > max_quiver)
 							{
 								max_quiver = temp_wr;

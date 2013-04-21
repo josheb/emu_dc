@@ -440,6 +440,9 @@ bool Mob::DoCastSpell(uint16 spell_id, uint16 target_id, uint16 slot,
 		return(true);
 	}
 
+	//DCBOOKMARK
+	cast_time = mod_cast_time(cast_time);
+
 	// ok we know it has a cast time so we can start the timer now
 	spellend_timer.Start(cast_time);
 	
@@ -2370,6 +2373,9 @@ int Mob::CalcBuffDuration(Mob *caster, Mob *target, uint16 spell_id, int32 caste
 		IsBlindSpell(spell_id))
 		res += 1;
 	
+	//DCBOOKMARK
+	res = mod_buff_duration(res, caster, target, spell_id);
+
 	mlog(SPELLS__CASTING, "Spell %d: Casting level %d, formula %d, base_duration %d: result %d",
 		spell_id, castlevel, formula, duration, res);
 		
@@ -2472,6 +2478,10 @@ int Mob::CheckStackConflict(uint16 spellid1, int caster_level1, uint16 spellid2,
 			mlog(SPELLS__STACKING, "Blocking spell because manaburn/lifeburn does not stack with itself");
 			return -1;
 		}
+
+	//DCBOOKMARK
+	int modval = mod_spell_stack(spellid1, caster_level1, caster1, spellid2, caster_level2, caster2);
+	if(modval < 2) { return(modval); }
 
 	//resurrection effects wont count for overwrite/block stacking
 	switch(spellid1)
@@ -4061,40 +4071,67 @@ float Mob::ResistSpell(uint8 resist_type, uint16 spell_id, Mob *caster, bool use
 		resist_chance = 0;
 	}
 
-	//Adjust our resist chance based on level modifiers
-	int temp_level_diff = GetLevel() - caster->GetLevel();
-	if(IsNPC() && GetLevel() >= RuleI(Casting, ResistFalloff))
-	{
-		int a = (RuleI(Casting, ResistFalloff) - 1) - caster->GetLevel();
-		if(a > 0)
-		{
-			temp_level_diff = a;
-		}
-		else
-		{
-			temp_level_diff = 0;
-		}
-	}
+    //Adjust our resist chance based on level modifiers
+    int temp_level_diff = GetLevel() - caster->GetLevel();
+    if(IsNPC() && GetLevel() >= RuleI(Casting,ResistFalloff))
+    {
+        int a = (RuleI(Casting,ResistFalloff)-1) - caster->GetLevel();
+        if(a > 0)
+        {
+            temp_level_diff = a;
+        }
+        else
+        {
+            temp_level_diff = 0;
+        }
+    }
 
-	if(IsClient() && GetLevel() >= 21 && temp_level_diff > 15)
-	{
-		temp_level_diff = 15;
-	}
+    if(IsClient() && GetLevel() >= 21 && temp_level_diff > 15)
+    {
+        temp_level_diff = 15;
+    }
 
-	if(IsNPC() && temp_level_diff < -9)
-	{
-		temp_level_diff = -9;
-	}
+    if(IsNPC() && temp_level_diff < -9)
+    {
+        temp_level_diff = -9;
+    }
 
-	int level_mod = temp_level_diff * temp_level_diff / 2;
-	if(temp_level_diff < 0)
-	{
-		level_mod = -level_mod;
-	}
+    int level_mod = temp_level_diff * temp_level_diff / 2;
+    if(temp_level_diff < 0)
+    {
+        level_mod = -level_mod;
+    }
 
-	if(IsNPC() && (caster->GetLevel() - GetLevel()) < -20)
+    if(IsNPC() && (caster->GetLevel() - GetLevel()) < -20)
+    {
+        level_mod = 1000;
+    }
+
+    //Even more level stuff this time dealing with damage spells
+    if(IsNPC() && IsDamageSpell(spell_id) && GetLevel() >= 17)
+    {
+        int level_diff;
+        if(GetLevel() >= RuleI(Casting,ResistFalloff))
+        {
+            level_diff = (RuleI(Casting,ResistFalloff)-1) - caster->GetLevel();
+            if(level_diff < 0)
+            {
+                level_diff = 0;
+            }
+        }
+        else
+        {
+            level_diff = GetLevel() - caster->GetLevel();
+        }
+        level_mod += (2 * level_diff);
+    }
+
+	if (CharismaCheck)
 	{
-		level_mod = 1000;
+		//For charm chance to break checks, Default 10 CHA = -1 resist mod.
+		int16 cha_resist_modifier = 0;
+		cha_resist_modifier	= caster->GetCHA()/RuleI(Spells, CharismaEffectiveness);
+		resist_modifier -= cha_resist_modifier;
 	}
 
 	//Add our level, resist and -spell resist modifier to our roll chance
@@ -4102,32 +4139,8 @@ float Mob::ResistSpell(uint8 resist_type, uint16 spell_id, Mob *caster, bool use
 	resist_chance += resist_modifier;
 	resist_chance += target_resist;
 
-	if (CharismaCheck)
-	{
-		//For charm chance to break checks, Default 10 CHA = -1 resist mod. 
-		int16 cha_resist_modifier = 0;
-		cha_resist_modifier	= caster->GetCHA()/RuleI(Spells, CharismaEffectiveness); 
-		resist_chance -= cha_resist_modifier;
-	}
-
-	//Even more level stuff this time dealing with damage spells
-	if(IsNPC() && IsDamageSpell(spell_id) && GetLevel() >= 17)
-	{
-		int level_diff;
-		if(GetLevel() >= RuleI(Casting, ResistFalloff))
-		{
-			level_diff = (RuleI(Casting, ResistFalloff) - 1) - caster->GetLevel();
-			if(level_diff < 0)
-			{
-				level_diff = 0;
-			}
-		}
-		else
-		{
-			level_diff = GetLevel() - caster->GetLevel();
-		}
-		resist_chance += (2 * level_diff);
-	}
+	//DCBOOKMARK
+	resist_chance = mod_spell_resist(resist_chance, level_mod, resist_modifier, target_resist, resist_type, spell_id, caster);
 
 	//Do our min and max resist checks.
 	if(resist_chance > spells[spell_id].MaxResist && spells[spell_id].MaxResist != 0)
