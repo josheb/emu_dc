@@ -23,58 +23,13 @@ extern WorldServer worldserver;
 
 using namespace std;
 
-//Spawn serverman when a zone boots or is repopped.
-void Zone::mod_init()
-{
-    const NPCType* tmp = 0;
-    if((tmp = database.GetNPCType(999999)))
-    {
-        NPC* npc = new NPC(tmp, 0, 0, 0, 0, 0, FlyMode3);
-        if(npc)
-        {
-            entity_list.AddNPC(npc);
-        }
-    }
-}
+void Zone::mod_init() { return; }
+void Zone::mod_repop() { return; }
 
-void Zone::mod_repop()
-{
-    const NPCType* tmp = 0;
-    if((tmp = database.GetNPCType(999999)))
-    {
-        NPC* npc = new NPC(tmp, 0, 0, 0, 0, 0, FlyMode3);
-        if(npc)
-        {
-            entity_list.AddNPC(npc);
-        }
-    }
-}
-
-void NPC::mod_prespawn(Spawn2 *sp)
-{
-    //The spawn has to have 1 kill to qualify
-    if(sp->GetKillCount() < 1) { return; }
-    //Ignore existing bosses
-    if(lastname[0] == '[') { return; }
-    //5% chance to elevate
-    if(MakeRandomInt(0, 100) > 5) { return; }
-
-    //Let everything else happen in perl.  Our job here is to set the last name
-    int npcscore = GetScore();
-    std::string bosstag = "<";
-    int lvs = (int)(npcscore/10);
-    for(int x = 0; x < 10; x++)
-    {
-        if(x < lvs) { bosstag += "+"; }
-        else { bosstag += "="; }
-    }
-    bosstag += ">";
-    strn0cpy(lastname, bosstag.c_str(), sizeof(lastname));
-
-    TempName("DYNBOSS");
-}
-
+void NPC::mod_prespawn(Spawn2 *sp) { return; }
 int NPC::mod_npc_damage(int damage, SkillType skillinuse, int hand, ItemInst* weapon, Mob* other) { return(damage); }
+void NPC::mod_npc_killed_merit(Mob* c) { return; }
+void NPC::mod_npc_killed(Mob* oos) { return; }
 
 int Client::mod_client_damage(int damage, SkillType skillinuse, int hand, ItemInst* weapon, Mob* other) { return(damage); }
 bool Client::mod_client_message(char* message, uint8 chan_num) { return(true); } //Potentially dangerous string handling here
@@ -86,6 +41,12 @@ int Client::mod_client_haste(int h) { return(h); }
 void Client::mod_consider(Mob* tmob, Consider_Struct* con) { return; }
 bool Client::mod_saylink(const std::string&, bool silentsaylink) { return(true); }
 int16 Client::mod_pet_power(int16 act_power, uint16 spell_id) { return(act_power); }
+float Client::mod_tradeskill_chance(float chance, DBTradeskillRecipe_Struct *spec) { return(chance); }
+float Client::mod_tradeskill_skillup(float chance_stage2) { return(chance_stage2); }
+int32 Client::mod_tribute_item_value(int32 pts) { return(pts); }
+void Client::mod_client_death_npc(Mob* killerMob) { return; }
+void Client::mod_client_death_duel(Mob* killerMob) { return; }
+void Client::mod_client_death_env() { return; }
 
 int Mob::mod_effect_value(int effect_value, uint16 spell_id, int effect_type, Mob* caster) { return(effect_value); }
 float Mob::mod_hit_chance(float chancetohit, SkillType skillinuse, Mob* attacker) { return(chancetohit); }

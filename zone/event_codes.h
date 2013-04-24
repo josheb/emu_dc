@@ -59,6 +59,8 @@ typedef enum {
 	EVENT_DISCONNECT,
 	EVENT_CONNECT,
 	EVENT_ITEM_TICK,
+	EVENT_DUEL_WIN,
+	EVENT_DUEL_LOSE,
 
 	_LargestEventID
 } QuestEventID;

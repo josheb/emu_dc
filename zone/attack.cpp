@@ -1486,6 +1486,10 @@ void Client::Death(Mob* killerMob, int32 damage, uint16 spell, SkillType attack_
 	{
 		if (killerMob->IsNPC()) {
             parse->EventNPC(EVENT_SLAY, killerMob->CastToNPC(), this, "", 0);
+
+			//DCBOOKMARK
+			mod_client_death_npc(killerMob);
+
 			uint16 emoteid = killerMob->GetEmoteID();
 			if(emoteid != 0)
 				killerMob->CastToNPC()->DoNPCEmote(KILLEDPC,emoteid);
@@ -1501,6 +1505,10 @@ void Client::Death(Mob* killerMob, int32 damage, uint16 spell, SkillType attack_
 				killerMob->CastToClient()->SetDueling(false);
 				killerMob->CastToClient()->SetDuelTarget(0);
 				entity_list.DuelMessage(killerMob,this,false);
+
+				//DCBOOKMARK
+				mod_client_death_duel(killerMob);
+
 			} else {
 				//otherwise, we just died, end the duel.
 				Mob* who = entity_list.GetMob(GetDuelTarget());
@@ -2128,6 +2136,10 @@ void NPC::Death(Mob* killerMob, int32 damage, uint16 spell, SkillType attack_ski
 			for (int i = 0; i < MAX_RAID_MEMBERS; i++) {
 				if (kr->members[i].member != NULL) { // If Group Member is Client
                     parse->EventNPC(EVENT_KILLED_MERIT, this, kr->members[i].member, "killed", 0);
+
+					//DCBOOKMARK
+					mod_npc_killed_merit(kr->members[i].member);
+
 					if(RuleB(TaskSystem, EnableTaskSystem))
 						kr->members[i].member->UpdateTasksOnKill(GetNPCTypeID());
 					PlayerCount++;
@@ -2168,6 +2180,10 @@ void NPC::Death(Mob* killerMob, int32 damage, uint16 spell, SkillType attack_ski
 				if (kg->members[i] != NULL && kg->members[i]->IsClient()) { // If Group Member is Client
 					Client *c = kg->members[i]->CastToClient();
                     parse->EventNPC(EVENT_KILLED_MERIT, this, c, "killed", 0);
+
+					//DCBOOKMARK
+					mod_npc_killed_merit(c);
+
 					if(RuleB(TaskSystem, EnableTaskSystem))
 						c->UpdateTasksOnKill(GetNPCTypeID());
 
@@ -2212,6 +2228,10 @@ void NPC::Death(Mob* killerMob, int32 damage, uint16 spell, SkillType attack_ski
 			}
 			 /* Send the EVENT_KILLED_MERIT event */
             parse->EventNPC(EVENT_KILLED_MERIT, this, give_exp_client, "killed", 0);
+
+			//DCBOOKMARK
+			mod_npc_killed_merit(give_exp_client);
+
 			if(RuleB(TaskSystem, EnableTaskSystem))
 				give_exp_client->UpdateTasksOnKill(GetNPCTypeID());
 
@@ -2342,6 +2362,10 @@ void NPC::Death(Mob* killerMob, int32 damage, uint16 spell, SkillType attack_ski
 	if(killerMob) {
 		Mob *oos = killerMob->GetOwnerOrSelf();
         parse->EventNPC(EVENT_DEATH, this, oos, "", 0);
+
+		//DCBOOKMARK
+		mod_npc_killed(oos);
+
 		uint16 emoteid = this->GetEmoteID();
 		if(emoteid != 0)
 			this->DoNPCEmote(ONDEATH,emoteid);

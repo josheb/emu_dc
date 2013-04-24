@@ -459,6 +459,8 @@ public:
     int 	GetScore();
     void 	mod_prespawn(Spawn2 *sp);
 	int 	mod_npc_damage(int damage, SkillType skillinuse, int hand, ItemInst* weapon, Mob* other);
+	void	mod_npc_killed_merit(Mob* c);
+	void	mod_npc_killed(Mob* oos);
 
 protected:
 	

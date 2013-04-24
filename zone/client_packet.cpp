@@ -7777,7 +7777,12 @@ void Client::Handle_OP_EnvDamage(const EQApplicationPacket *app)
 		SetHP(GetHP() - damage);
 
 	if(GetHP() <= 0)
+	{
+		//DCBOOKMARK
+		mod_client_death_env();
+
 		Death(0, 32000, SPELL_UNKNOWN, HAND_TO_HAND);
+	}
 	SendHPUpdate();
 	return;
 }

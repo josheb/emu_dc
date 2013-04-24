@@ -94,7 +94,9 @@ const char *QuestEventSubroutines[_LargestEventID] = {
 	"EVENT_DISCOVER_ITEM",
 	"EVENT_DISCONNECT",
 	"EVENT_CONNECT",
-	"EVENT_ITEM_TICK"
+	"EVENT_ITEM_TICK",
+	"EVENT_DUEL_WIN",
+	"EVENT_DUEL_LOSE"
 };
 
 extern Zone* zone;
@@ -803,6 +805,14 @@ void PerlembParser::EventCommon(QuestEventID event, uint32 objid, const char * d
 			ExportVar(packagename.c_str(), "itemid", extradata);
 			break;
 		}
+
+		case EVENT_DUEL_WIN:
+		case EVENT_DUEL_LOSE:
+        {
+            ExportVar(packagename.c_str(), "enemyname", data);
+            ExportVar(packagename.c_str(), "enemyid", extradata);
+            break;
+        }
 
 		//nothing special about these events
 		case EVENT_DEATH:
